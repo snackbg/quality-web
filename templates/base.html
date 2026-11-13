@@ -1,0 +1,228 @@
+{% load static %}
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Quality System{% endblock %} · Quality System</title>
+  <link rel="stylesheet" href="{% static 'dashboard.css' %}">
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <a class="brand" href="{% url 'dashboard' %}" title="Quality Desk">
+          <span class="brand-mark">Q</span>
+          <span class="brand-copy"><strong>QUALITY</strong><small>Human Management System</small></span>
+        </a>
+        <button class="sidebar-toggle" id="sidebar-toggle" type="button" aria-label="Thu gọn sidebar" aria-expanded="true" title="Thu gọn sidebar"><span aria-hidden="true">‹</span></button>
+      </div>
+      <div class="nav-label">WORKSPACE</div>
+      <nav class="main-nav" aria-label="Điều hướng">
+        {% if access.can_view_dashboard %}<a class="nav-link {% if request.resolver_match.url_name == 'dashboard' %}is-active{% endif %}" href="{% url 'dashboard' %}" title="Dashboard">
+          <span class="nav-icon">
+            <svg xmlns="http://www.w3.org/2000/svg"
+              fill="white" 
+              viewBox="0 0 640 640">
+            <path d="M304 70.1C313.1 61.9 326.9 61.9 336 70.1L568 278.1C577.9 286.9 578.7 302.1 569.8 312C560.9 321.9 545.8 322.7 535.9 313.8L527.9 306.6L527.9 511.9C527.9 547.2 499.2 575.9 463.9 575.9L175.9 575.9C140.6 575.9 111.9 547.2 111.9 511.9L111.9 306.6L103.9 313.8C94 322.6 78.9 321.8 70 312C61.1 302.2 62 287 71.8 278.1L304 70.1zM320 120.2L160 263.7L160 512C160 520.8 167.2 528 176 528L224 528L224 424C224 384.2 256.2 352 296 352L344 352C383.8 352 416 384.2 416 424L416 528L464 528C472.8 528 480 520.8 480 512L480 263.7L320 120.3zM272 528L368 528L368 424C368 410.7 357.3 400 344 400L296 400C282.7 400 272 410.7 272 424L272 528z"/>
+            </svg>
+        </span>
+        <span class="nav-text">Dashboard</span></a>{% endif %}
+        {% if access.can_view_employees or access.can_view_attendance or access.can_view_checkout or access.can_view_attendance_reports %}
+        <section class="nav-group {% if request.resolver_match.url_name == 'employees' or request.resolver_match.url_name == 'attendance' or request.resolver_match.url_name == 'checkout' or request.resolver_match.url_name == 'attendance-reports' or request.resolver_match.url_name == 'attendance-leave' %}has-active-child is-open{% endif %}" id="people-nav-group">
+          <button class="nav-group-toggle" id="people-nav-toggle" type="button" aria-controls="people-nav-links" aria-expanded="{% if request.resolver_match.url_name == 'employees' or request.resolver_match.url_name == 'attendance' or request.resolver_match.url_name == 'checkout' or request.resolver_match.url_name == 'attendance-reports' or request.resolver_match.url_name == 'attendance-leave' %}true{% else %}false{% endif %}" title="Quản lý nhân sự">
+            <span class="nav-icon">
+              <svg xmlns="http://www.w3.org/2000/svg"
+                fill="white" 
+                viewBox="0 0 640 640">
+                <path d="M96 224c35.3 0 64-28.7 64-64s-28.7-64-64-64-64 28.7-64 64 28.7 64 64 64zm448 
+                        0c35.3 0 64-28.7 64-64s-28.7-64-64-64-64 28.7-64 64 28.7 64 64 64zm32 32h-64c-17.6 0-33.5 
+                        7.1-45.1 18.6 40.3 22.1 68.9 62 75.1 109.4h66c17.7 0 32-14.3 32-32v-32c0-35.3-28.7-64-64-64zm-256 
+                        0c61.9 0 112-50.1 112-112S381.9 32 320 32 208 82.1 208 144s50.1 112 112 112zm76.8 32h-8.3c-20.8 10-43.9 
+                        16-68.5 16s-47.6-6-68.5-16h-8.3C179.6 288 128 339.6 128 403.2V432c0 26.5 21.5 48 48 48h288c26.5 0 48-21.5 
+                        48-48v-28.8c0-63.6-51.6-115.2-115.2-115.2zm-223.7-13.4C161.5 263.1 145.6 256 128 256H64c-35.3 
+                        0-64 28.7-64 64v32c0 17.7 14.3 32 32 32h65.9c6.3-47.4 34.9-87.3 75.2-109.4z"/>
+              </svg>
+            </span>
+            <span class="nav-text">Quản lý nhân sự</span>
+            <span class="nav-chevron" aria-hidden="true">
+              <svg xmlns="http://www.w3.org/2000/svg"
+                fill="currentColor"
+                viewBox="0 0 640 640" width="16" height="16">
+                <path d="M320 576C461.4 576 576 461.4 576 320C576 178.6 461.4 64 320 64C178.6 64 64 178.6 64 320C64 461.4 178.6 576 320 
+                        576zM303 441L223 361C213.6 351.6 213.6 336.4 223 327.1C232.4 317.8 247.6 317.7 256.9 327.1L295.9 366.1L295.9 216C295.9 
+                        202.7 306.6 192 319.9 192C333.2 192 343.9 202.7 343.9 216L343.9 366.1L382.9 327.1C392.3 317.7 407.5 317.7 416.8 327.1C426.1 
+                        336.5 426.2 351.7 416.8 361L336.8 441C327.4 450.4 312.2 450.4 302.9 441z"/>
+              </svg>
+            </span>
+          </button>
+          <div class="nav-submenu" id="people-nav-links">
+            {% if access.can_view_employees %}<a class="nav-link {% if request.resolver_match.url_name == 'employees' %}is-active{% endif %}" href="{% url 'employees' %}" title="Nhân sự">
+              <span class="nav-icon">
+                <svg xmlns="http://www.w3.org/2000/svg"
+                fill="white" 
+                viewBox="0 0 448 512" width="14" height="14">
+                <path d="M224 256c70.7 0 128-57.3 128-128S294.7 0 224 0 96 57.3 96 128s57.3 128 128 128zm89.6
+                        32h-16.7c-22.2 10.2-46.9 16-72.9 16s-50.6-5.8-72.9-16h-16.7C60.2 288 0 348.2 0 422.4V464c0 
+                        26.5 21.5 48 48 48h352c26.5 0 48-21.5 48-48v-41.6c0-74.2-60.2-134.4-134.4-134.4z"/>
+                </svg>
+              </span>
+              <span class="nav-text">Nhân sự</span>
+            </a>{% endif %}
+            {% if access.can_view_attendance %}<a class="nav-link {% if request.resolver_match.url_name == 'attendance' %}is-active{% endif %}" href="{% url 'attendance' %}" title="Check In">
+              <span class="nav-icon">
+                <svg xmlns="http://www.w3.org/2000/svg"
+                fill="white" 
+                viewBox="0 0 640 512" width="16" height="16">
+                <path d="M224 256c70.7 0 128-57.3 128-128S294.7 0 224 0 96 57.3 96 128s57.3 128 128 128zm89.6 
+                        32h-16.7c-22.2 10.2-46.9 16-72.9 16s-50.6-5.8-72.9-16h-16.7C60.2 288 0 348.2 0 422.4V464c0 26.5 21.5 
+                        48 48 48h352c26.5 0 48-21.5 48-48v-41.6c0-74.2-60.2-134.4-134.4-134.4zm323-128.4l-27.8-28.1c-4.6-4.7-12.1-4.7-16.8-.1l-104.8 
+                        104-45.5-45.8c-4.6-4.7-12.1-4.7-16.8-.1l-28.1 27.9c-4.7 4.6-4.7 12.1-.1 16.8l81.7 82.3c4.6 4.7 12.1 4.7 16.8.1l141.3-140.2c4.6-4.7 4.7-12.2.1-16.8z"/>
+                </svg>
+              </span>
+              <span class="nav-text">Check In</span></a>{% endif %}
+            {% if access.can_view_checkout %}<a class="nav-link {% if request.resolver_match.url_name == 'checkout' %}is-active{% endif %}" href="{% url 'checkout' %}" title="Check Out">
+              <span class="nav-icon">
+                <svg xmlns="http://www.w3.org/2000/svg"
+                fill="white" 
+                viewBox="0 0 640 512" width="16" height="16">
+                <path d="M496 224c-79.6 0-144 64.4-144 144s64.4 144 144 144 144-64.4 144-144-64.4-144-144-144zm64 150.3c0 5.3-4.4 
+                        9.7-9.7 9.7h-60.6c-5.3 0-9.7-4.4-9.7-9.7v-76.6c0-5.3 4.4-9.7 9.7-9.7h12.6c5.3 0 9.7 4.4 9.7 9.7V352h38.3c5.3 0 9.7 
+                        4.4 9.7 9.7v12.6zM320 368c0-27.8 6.7-54.1 18.2-77.5-8-1.5-16.2-2.5-24.6-2.5h-16.7c-22.2 10.2-46.9 16-72.9 
+                        16s-50.6-5.8-72.9-16h-16.7C60.2 288 0 348.2 0 422.4V464c0 26.5 21.5 48 48 48h347.1c-45.3-31.9-75.1-84.5-75.1-144zm-96-112c70.7 
+                        0 128-57.3 128-128S294.7 0 224 0 96 57.3 96 128s57.3 128 128 128z"/>
+                </svg>
+              </span>
+              <span class="nav-text">Check Out</span></a>{% endif %}
+            {% if access.can_view_attendance_reports %}<a class="nav-link {% if request.resolver_match.url_name == 'attendance-reports' %}is-active{% endif %}" href="{% url 'attendance-reports' %}" title="Báo cáo">
+              <span class="nav-icon">
+                <svg xmlns="http://www.w3.org/2000/svg"
+                fill="white" 
+                viewBox="0 0 512 512" width="16" height="16">
+                <path d="M496 384H64V80c0-8.84-7.16-16-16-16H16C7.16 64 0 71.16 0 80v336c0 17.67 14.33 32 32 32h464c8.84
+                        0 16-7.16 16-16v-32c0-8.84-7.16-16-16-16zM464 96H345.94c-21.38 0-32.09 25.85-16.97 40.97l32.4 32.4L288 
+                        242.75l-73.37-73.37c-12.5-12.5-32.76-12.5-45.25 0l-68.69 68.69c-6.25 6.25-6.25 16.38 0 22.63l22.62 22.62c6.25
+                        6.25 16.38 6.25 22.63 0L192 237.25l73.37 73.37c12.5 12.5 32.76 12.5 45.25 0l96-96 32.4 32.4c15.12 15.12 40.97 
+                        4.41 40.97-16.97V112c.01-8.84-7.15-16-15.99-16z"/>
+                </svg>
+              </span>
+              <span class="nav-text">Báo cáo</span></a>{% endif %}
+            {% if access.can_view_attendance %}<a class="nav-link {% if request.resolver_match.url_name == 'attendance-leave' %}is-active{% endif %}" href="{% url 'attendance-leave' %}" title="Chấm Phép">
+              <span class="nav-icon">
+                <svg xmlns="http://www.w3.org/2000/svg"
+                fill="white" 
+                viewBox="0 0 640 640" width="16" height="16">
+                <path d="M136.5 88C136.5 57.1 161.6 32 192.5 32C223.4 32 248.5 57.1 248.5 88C248.5 118.9 223.4 144 192.5 
+                        144C161.6 144 136.5 118.9 136.5 88zM128.5 269.3L105.9 291.9C99.9 297.9 96.5 306 96.5 314.5L96.5 352C96.5 
+                        369.7 82.2 384 64.5 384C46.8 384 32.5 369.7 32.5 352L32.5 314.5C32.5 289 42.6 264.6 60.6 246.6L95.7 211.5C118.5 
+                        188.7 149.3 175.9 181.5 175.9C218.4 175.9 253.3 192.7 276.3 221.5L294.3 244C300.4 251.6 309.6 256 319.3 256L352.5 
+                        256C370.2 256 384.5 270.3 384.5 288C384.5 305.7 370.2 320 352.5 320L319.3 320C290.1 320 262.6 306.7 244.3 284L240.5 
+                        279.3L240.5 394.5L275 424.1C292.7 439.3 304.3 460.3 307.6 483.4L320.2 571.5C322.7 589 310.5 605.2 293 607.7C275.5 610.2 
+                        259.3 598 256.8 580.5L244.2 492.4C243.1 484.7 239.2 477.7 233.3 472.6L162 411.5C140.7 393.3 128.5 366.6 128.5 338.6L128.5 
+                        269.3zM128.6 435C131 437.3 133.4 439.6 136 441.8L182 481.2L179.8 488.8C175.3 504.5 166.9 518.8 155.4 530.3L87.1 598.6C74.6 
+                        611.1 54.3 611.1 41.8 598.6C29.3 586.1 29.3 565.8 41.8 553.3L110.1 485C113.9 481.2 116.7 476.4 118.2 471.2L128.6 435zM537.5 
+                        409C528.1 418.4 512.9 418.4 503.6 409C494.3 399.6 494.2 384.4 503.6 375.1L534.6 344.1L432.5 344.1C419.2 344.1 408.5 333.4 
+                        408.5 320.1C408.5 306.8 419.2 296.1 432.5 296.1L534.6 296.1L503.6 265.1C494.2 255.7 494.2 240.5 503.6 231.2C513 221.9 528.2 
+                        221.8 537.5 231.2L609.5 303.2C618.9 312.6 618.9 327.8 609.5 337.1L537.5 409.1z"/>
+                </svg>
+              </span>
+              <span class="nav-text">Chấm Phép</span></a>{% endif %}
+          </div>
+        </section>
+        {% endif %}
+        {% if access.can_view_handovers %}<a class="nav-link {% if request.resolver_match.url_name == 'handovers' %}is-active{% endif %}" href="{% url 'handovers' %}" title="Bàn giao">
+          <span class="nav-icon">
+            <svg xmlns="http://www.w3.org/2000/svg"
+                fill="white" 
+                viewBox="0 0 640 640" width="16" height="16">
+                <path d="M300.9 149.2L184.3 278.8C179.7 283.9 179.9 291.8 184.8 296.7C215.3 327.2 264.8 327.2 295.3 296.7L327.1 
+                      264.9C331.3 260.7 336.6 258.4 342 258C348.8 257.4 355.8 259.7 361 264.9L537.6 440L608 384L608 96L496 160L472.2 
+                      144.1C456.4 133.6 437.9 128 418.9 128L348.5 128C347.4 128 346.2 128 345.1 128.1C328.2 129 312.3 136.6 300.9 149.2zM148.6 
+                      246.7L255.4 128L215.8 128C190.3 128 165.9 138.1 147.9 156.1L144 160L32 96L32 384L188.4 514.3C211.4 533.5 240.4 544 270.3 
+                      544L286 544L279 537C269.6 527.6 269.6 512.4 279 503.1C288.4 493.8 303.6 493.7 312.9 503.1L353.9 544.1L362.9 544.1C382 544.1 
+                      400.7 539.8 417.7 531.8L391 505C381.6 495.6 381.6 480.4 391 471.1C400.4 461.8 415.6 461.7 424.9 471.1L456.9 503.1L474.4 
+                      485.6C483.3 476.7 485.9 463.8 482 452.5L344.1 315.7L329.2 330.6C279.9 379.9 200.1 379.9 150.8 330.6C127.8 307.6 126.9 270.7 148.6 246.6z"/>
+              </svg>
+          </span>
+          <span class="nav-text">Giao ca</span></a>{% endif %}
+        {% if access.can_manage_access %}<a class="nav-link {% if request.resolver_match.url_name == 'access-management' %}is-active{% endif %}" href="{% url 'access-management' %}" title="Phân quyền">
+          <span class="nav-icon">
+            <svg xmlns="http://www.w3.org/2000/svg"
+              fill="white" 
+              viewBox="0 0 640 640" width="16" height="16">
+              <path d="M259.1 73.5C262.1 58.7 275.2 48 290.4 48L350.2 48C365.4 48 378.5 58.7 381.5 73.5L396 143.5C410.1 149.5 
+                    423.3 157.2 435.3 166.3L503.1 143.8C517.5 139 533.3 145 540.9 158.2L570.8 210C578.4 223.2 575.7 239.8 564.3 249.9L511 
+                    297.3C511.9 304.7 512.3 312.3 512.3 320C512.3 327.7 511.8 335.3 511 342.7L564.4 390.2C575.8 400.3 578.4 417 570.9 
+                    430.1L541 481.9C533.4 495 517.6 501.1 503.2 496.3L435.4 473.8C423.3 482.9 410.1 490.5 396.1 496.6L381.7 566.5C378.6 
+                    581.4 365.5 592 350.4 592L290.6 592C275.4 592 262.3 581.3 259.3 566.5L244.9 496.6C230.8 490.6 217.7 482.9 205.6 473.8L137.5 
+                    496.3C123.1 501.1 107.3 495.1 99.7 481.9L69.8 430.1C62.2 416.9 64.9 400.3 76.3 390.2L129.7 342.7C128.8 335.3 128.4 327.7 128.4 
+                    320C128.4 312.3 128.9 304.7 129.7 297.3L76.3 249.8C64.9 239.7 62.3 223 69.8 209.9L99.7 158.1C107.3 144.9 123.1 138.9 137.5 
+                    143.7L205.3 166.2C217.4 157.1 230.6 149.5 244.6 143.4L259.1 73.5zM320.3 400C364.5 399.8 400.2 363.9 400 319.7C399.8 275.5 
+                    363.9 239.8 319.7 240C275.5 240.2 239.8 276.1 240 320.3C240.2 364.5 276.1 400.2 320.3 400z"/>
+            </svg>
+          </span>
+          <span class="nav-text">Phân quyền</span></a>{% endif %}
+      </nav>
+    </aside>
+
+    <main class="main-area">
+      <header class="topbar">
+        <div class="topbar-kicker">QUALITY OPERATIONS<span>/</span> {% block breadcrumb %}DASHBOARD{% endblock %}</div>
+        <div class="user-menu">
+          <span class="avatar">{{ request.user.username|slice:":1"|upper }}</span>
+          <span class="user-name">{{ request.user.get_username }}</span>
+          <!-- <span class="role-chip">{{ access.role_label }}</span> -->
+          <form method="post" action="{% url 'logout' %}">{% csrf_token %}<button class="logout-button" type="submit">Đăng xuất</button></form>
+        </div>
+      </header>
+      <div class="page-content">
+        {% if messages %}
+          <div class="messages" aria-live="polite">
+            {% for message in messages %}<div class="message message-{{ message.tags }}">{{ message }}</div>{% endfor %}
+          </div>
+        {% endif %}
+        {% block content %}{% endblock %}
+      </div>
+      <footer class="page-footer"><span>QUALITY HUMAN MANAGEMENT</span><span>Developed by Snack</span></footer>
+    </main>
+  </div>
+      <script>
+        (() => {
+          const sidebarToggle = document.getElementById("sidebar-toggle");
+          const group = document.getElementById("people-nav-group");
+          const groupToggle = document.getElementById("people-nav-toggle");
+          const body = document.body;
+
+          if (!sidebarToggle || !group || !groupToggle) return;
+
+          const setCollapsed = (collapsed) => {
+            body.classList.toggle("sidebar-collapsed", collapsed);
+            sidebarToggle.setAttribute("aria-expanded", String(!collapsed));
+            sidebarToggle.setAttribute("aria-label", collapsed ? "Expand sidebar" : "Collapse sidebar");
+            sidebarToggle.title = collapsed ? "Expand sidebar" : "Collapse sidebar";
+            localStorage.setItem("quality-sidebar-collapsed", String(collapsed));
+          };
+          const setGroupOpen = (open) => {
+            group.classList.toggle("is-open", open);
+            groupToggle.setAttribute("aria-expanded", String(open));
+            localStorage.setItem("quality-people-nav-open", String(open));
+          };
+
+          setCollapsed(localStorage.getItem("quality-sidebar-collapsed") === "true");
+          if (group.classList.contains("has-active-child") || localStorage.getItem("quality-people-nav-open") === "true") {
+            setGroupOpen(true);
+          } else {
+            setGroupOpen(false);
+          }
+
+          sidebarToggle.addEventListener("click", () => {
+            setCollapsed(!body.classList.contains("sidebar-collapsed"));
+          });
+          groupToggle.addEventListener("click", () => {
+            if (body.classList.contains("sidebar-collapsed")) setCollapsed(false);
+            setGroupOpen(!group.classList.contains("is-open"));
+          });
+        })();
+      </script>
+</body>
+</html>

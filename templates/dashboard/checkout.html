@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+{% block title %}Check Out{% endblock %}
+{% block breadcrumb %}CHECK OUT{% endblock %}
+{% block content %}
+<section class="page-heading">
+  <div><span class="eyebrow">HUMAN CAPITAL · END OF SHIFT</span><h1>Điểm danh ra về</h1><p class="muted">Quét ID để ghi nhận giờ kết thúc ca.</p></div>
+  <span class="record-count"><strong>{{ checkout_rows|length }}</strong> lượt ra về hôm nay</span>
+</section>
+{% if checkout_result %}
+<section class="scan-result checkout-result" aria-live="polite">
+  <span class="scan-confirm-icon" aria-hidden="true">✓</span>
+  <div class="scan-confirm-copy"><span class="eyebrow">CHECK-OUT ĐÃ GHI NHẬN</span><h2>{{ checkout_result.name }}</h2><p>{{ checkout_result.employee_code }}{% if checkout_result.department %} · {{ checkout_result.department }}{% endif %}</p></div>
+  <div class="checkout-times"><div><span>CHECK IN</span><strong>{{ checkout_result.clock_in|default:'—' }}</strong></div><i aria-hidden="true">→</i><div><span>CHECK OUT</span><strong>{{ checkout_result.clock_out }}</strong></div></div>
+</section>
+{% endif %}
+{% if access.can_scan_checkout %}
+<section class="scan-station checkout-station">
+  <div class="scan-station-copy"><span class="scan-station-mark" aria-hidden="true">↗</span><div><span class="eyebrow">KIOSK · CUỐI GIỜ</span><h2>Sẵn sàng quét thẻ</h2><p>Chỉ ghi nhận khi nhân viên đã check-in hôm nay.</p></div></div>
+  <form method="post" class="scan-form" id="checkout-scan-form">
+    {% csrf_token %}
+    <label for="checkout-scan-id">SCAN ID</label>
+    <div class="scan-input-row"><div class="scan-input-wrap"><span aria-hidden="true">⌕</span><input id="checkout-scan-id" name="employee_code" type="text" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="Quét ID nhân viên" required autofocus></div><button class="button button-primary scan-submit" type="submit">Ghi giờ ra <span>↵</span></button></div>
+  </form>
+</section>
+{% endif %}
+<section class="panel table-panel">
+  <div class="section-heading"><div><span class="eyebrow">END-OF-SHIFT LOG</span><h2>Lượt check-out gần đây</h2></div><span class="record-count">Hôm nay</span></div>
+  <div class="table-scroll"><table><thead><tr><th>No</th><th>ID</th><th>Họ và tên</th><th>Clock In</th><th>Clock Out</th><th>Trạng thái</th></tr></thead><tbody>
+  {% for row in checkout_rows %}<tr><td class="row-number">{{ forloop.counter|stringformat:"02d" }}</td><td class="code-cell">{{ row.employee_code }}</td><td><span class="person-cell"><span class="person-avatar">{{ row.name|slice:":1"|upper }}</span><strong>{{ row.name }}</strong></span></td><td class="code-cell">{{ row.clock_in|default:'—' }}</td><td class="clock-cell">{{ row.clock_out }}</td><td><span class="status-pill pill-done">Đã ra về</span></td></tr>
+  {% empty %}<tr><td colspan="6"><div class="table-empty">Chưa có lượt check-out hôm nay.</div></td></tr>{% endfor %}
+  </tbody></table></div>
+</section>
+<script>
+  const checkoutInput = document.getElementById("checkout-scan-id");
+  if (checkoutInput) {
+    checkoutInput.focus();
+    checkoutInput.select();
+  }
+</script>
+{% endblock %}

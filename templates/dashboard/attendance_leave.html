@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% block title %}Chấm Phép{% endblock %}
+{% block breadcrumb %}CHẤM PHÉP{% endblock %}
+{% block content %}
+<section class="page-heading">
+  <div><span class="eyebrow">HUMAN CAPITAL · LEAVE ENTRY</span><h1>Chấm Phép</h1><p class="muted">Ghi nhận trạng thái nghỉ theo mã nhân viên và ngày áp dụng.</p></div>
+  <span class="record-count"><strong>{{ leave_records|length }}</strong> lượt nghỉ</span>
+</section>
+{% if access.can_manage_leave_records %}
+<section class="panel form-panel leave-form-panel">
+  <div class="section-heading"><div><span class="eyebrow">NEW LEAVE RECORD</span><h2>Thông tin chấm phép</h2></div><span class="form-index">{{ selected_date }}</span></div>
+  <form method="post" class="leave-entry-form">
+    {% csrf_token %}
+    <label>Mã nhân viên<input type="text" name="employee_code" maxlength="50" required autofocus autocomplete="off" placeholder="Quét hoặc nhập ID"></label>
+    <label>Tình trạng<select name="status" required><option value="" disabled selected>Chọn tình trạng nghỉ</option>{% for code, label in status_labels.items %}<option value="{{ code }}">{{ label }}</option>{% endfor %}</select></label>
+    <label>Ngày áp dụng<input type="date" name="work_date" value="{{ selected_date }}" required></label>
+    <label class="leave-reason-field">Lý do<textarea name="note" maxlength="500" rows="2" placeholder="Nhập lý do nghỉ"></textarea></label>
+    <div class="form-actions"><button class="button button-primary" type="submit">Ghi nhận chấm phép <span>→</span></button></div>
+  </form>
+</section>
+{% endif %}
+<section class="panel table-panel leave-list-panel">
+  <div class="section-heading"><div><span class="eyebrow">LEAVE RECORDS</span><h2>Nhân viên có dữ liệu chấm phép</h2></div>
+    <form method="get" class="date-picker"><label for="leave-list-date">Ngày</label><input id="leave-list-date" type="date" name="date" value="{{ selected_date }}"><button class="button button-dark" type="submit">Xem ngày</button></form>
+  </div>
+  <div class="table-scroll"><table><thead><tr><th>No</th><th>Mã nhân viên</th><th>Họ và tên</th><th>Ngày</th><th>Status</th><th>Lý do</th></tr></thead><tbody>
+  {% for row in leave_records %}<tr><td class="row-number">{{ forloop.counter|stringformat:"02d" }}</td><td class="code-cell">{{ row.employee_code }}</td><td><span class="person-cell"><span class="person-avatar">{{ row.name|slice:":1"|upper }}</span><strong>{{ row.name }}</strong></span></td><td class="code-cell">{{ row.work_date }}</td><td><span class="status-pill {% if row.status == 'AL' or row.status == 'SL' %}pill-leave{% else %}pill-open{% endif %}">{{ row.status_label }}</span></td><td>{{ row.note|default:'—' }}</td></tr>
+  {% empty %}<tr><td colspan="6"><div class="table-empty">Không có dữ liệu chấm phép trong ngày {{ selected_date }}.</div></td></tr>{% endfor %}
+  </tbody></table></div>
+</section>
+{% endblock %}

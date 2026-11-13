@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% block title %}Phân quyền{% endblock %}
+{% block breadcrumb %}PHÂN QUYỀN{% endblock %}
+{% block content %}
+<section class="page-heading">
+  <div><span class="eyebrow">ACCESS CONTROL</span><h1>Phân quyền người dùng</h1><p class="muted">Chọn phạm vi truy cập cho từng tài khoản nội bộ.</p></div>
+  <span class="record-count"><strong>{{ user_rows|length }}</strong> tài khoản</span>
+</section>
+<section class="access-intro">
+  <span class="access-lock" aria-hidden="true">⌑</span>
+  <div><strong>Quyền được kiểm tra ở server</strong><p>Ẩn mục trên menu không thay thế kiểm tra quyền khi truy cập URL hoặc gửi form trực tiếp.</p></div>
+</section>
+<section class="panel table-panel access-panel">
+  <div class="section-heading"><div><span class="eyebrow">USER DIRECTORY</span><h2>Tài khoản và vai trò</h2></div></div>
+  <div class="table-scroll"><table><thead><tr><th>Tài khoản</th><th>Email</th><th>Trạng thái</th><th>Vai trò ứng dụng</th><th></th></tr></thead><tbody>
+  {% for row in user_rows %}<tr><td><span class="person-cell"><span class="person-avatar">{{ row.user.username|slice:":1"|upper }}</span><strong>{{ row.user.username }}</strong></span></td><td>{{ row.user.email|default:'—' }}</td><td>{% if row.user.is_active %}<span class="status-pill pill-active">Đang hoạt động</span>{% else %}<span class="status-pill pill-open">Đã khóa</span>{% endif %}</td><td>{% if row.user.is_superuser %}<span class="status-pill pill-done">Quản trị hệ thống</span>{% else %}<span class="status-pill {% if row.role %}pill-active{% else %}pill-open{% endif %}">{% if row.role %}{{ row.role_label }}{% else %}Chưa phân quyền{% endif %}</span>{% endif %}</td><td>
+  {% if not row.user.is_superuser %}<form method="post" class="role-form">{% csrf_token %}<input type="hidden" name="user_id" value="{{ row.user.id }}"><label class="visually-hidden" for="role-{{ row.user.id }}">Vai trò cho {{ row.user.username }}</label><select id="role-{{ row.user.id }}" name="role" required><option value="" disabled {% if not row.role %}selected{% endif %}>Chọn role</option>{% for role, label in roles.items %}<option value="{{ role }}" {% if row.role == role %}selected{% endif %}>{{ label }}</option>{% endfor %}</select><button class="button button-small" type="submit">Lưu</button></form>{% else %}<span class="muted">Toàn quyền</span>{% endif %}
+  </td></tr>
+  {% empty %}<tr><td colspan="5"><div class="table-empty">Chưa có tài khoản nào.</div></td></tr>{% endfor %}
+  </tbody></table></div>
+</section>
+<section class="role-reference">
+  <div class="section-heading"><div><span class="eyebrow">ROLE MATRIX</span><h2>Phạm vi từng role</h2></div></div>
+  <div class="role-grid">
+    <article class="role-card role-admin"><span class="status-pill pill-done">ADMIN</span><h3>Toàn quyền vận hành</h3><p>Xem mọi trang, ghi nhận nhân sự/chấm công/bàn giao và quản lý role người dùng.</p></article>
+    <article class="role-card role-staff"><span class="status-pill pill-active">STAFF</span><h3>Thao tác nghiệp vụ</h3><p>Xem các khu vực chính, thêm nhân viên, scan check-in/check-out, chấm phép và cập nhật bàn giao.</p></article>
+    <article class="role-card role-viewer"><span class="status-pill pill-leave">VIEWER</span><h3>Chỉ xem</h3><p>Xem dashboard, danh sách nhân sự, chấm công, lịch sử chấm phép và bàn giao; không gửi thay đổi.</p></article>
+  </div>
+</section>
+{% endblock %}

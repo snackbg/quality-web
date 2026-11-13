@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+{% block title %}Nhân sự{% endblock %}
+{% block breadcrumb %}NHÂN SỰ{% endblock %}
+{% block content %}
+<section class="page-heading">
+  <div><span class="eyebrow">PEOPLE DIRECTORY</span><h1>Nhân sự</h1><p class="muted">Danh bạ nhân viên và đơn vị phụ trách.</p></div>
+  <span class="record-count"><strong>{{ employees|length }}</strong> nhân viên</span>
+</section>
+{% if access.can_manage_employees %}<section class="panel form-panel">
+  <div class="section-heading"><div><span class="eyebrow">THÊM VÀO DANH BẠ</span><h2>Hồ sơ nhân viên</h2></div><span class="form-index">01 / NEW</span></div>
+  <form method="post" class="form-grid">
+    {% csrf_token %}
+    <label>Mã nhân viên<input name="employee_code" maxlength="50" required placeholder="VD: QW-024"></label>
+    <label>Họ và tên<input name="name" maxlength="100" required placeholder="Nguyễn Minh Anh"></label>
+    <label>Phòng ban<input name="department" maxlength="100" placeholder="Quality Assurance"></label>
+    <label>Chức vụ<input name="position" maxlength="100" placeholder="Kỹ thuật viên"></label>
+    <div class="form-actions"><button class="button button-primary" type="submit">Thêm nhân viên <span>+</span></button></div>
+  </form>
+</section>
+<section class="panel bulk-import-panel">
+  <div class="section-heading"><div><span class="eyebrow">BULK IMPORT</span><h2>Thêm hàng loạt từ Excel</h2></div><span class="form-index">XLSX · MAX 5 MB / 500 ROWS</span></div>
+  <div class="bulk-import-layout">
+    <div class="bulk-import-info"><p class="muted">Chuẩn bị các cột <span class="code-cell">employee_code</span>, <span class="code-cell">name</span>, <span class="code-cell">department</span>, <span class="code-cell">position</span>. Hai cột đầu là bắt buộc.</p><a class="button button-small" href="{% url 'employees' %}?download_template=1">Tải file mẫu <span>↓</span></a></div>
+    <form method="post" enctype="multipart/form-data" class="bulk-import-form">
+      {% csrf_token %}
+      <label>Chọn file Excel (.xlsx)<input type="file" name="employee_file" accept=".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" required></label>
+      <button class="button button-primary" type="submit">Import nhân viên <span>↑</span></button>
+    </form>
+  </div>
+</section>
+{% endif %}
+<section class="panel table-panel">
+  <div class="section-heading"><div><span class="eyebrow">DIRECTORY</span><h2>Danh sách nhân viên</h2></div>
+    <form method="get" class="search-form"><label class="visually-hidden" for="employee-search">Tìm kiếm nhân viên</label><input id="employee-search" name="q" value="{{ query }}" placeholder="Tìm tên, mã, phòng ban"><button type="submit" aria-label="Tìm kiếm" title="Tìm kiếm">⌕</button></form>
+  </div>
+  <div class="table-scroll"><table><thead><tr><th>Mã</th><th>Nhân viên</th><th>Phòng ban</th><th>Chức vụ</th><th>Trạng thái</th></tr></thead><tbody>
+  {% for employee in employees %}<tr><td class="code-cell">{{ employee.employee_code }}</td><td><span class="person-cell"><span class="person-avatar">{{ employee.name|slice:":1"|upper }}</span><strong>{{ employee.name }}</strong></span></td><td>{{ employee.department|default:'—' }}</td><td>{{ employee.position|default:'—' }}</td><td><span class="status-pill pill-active">{{ employee.status }}</span></td></tr>
+  {% empty %}<tr><td colspan="5"><div class="table-empty">Chưa có hồ sơ phù hợp. Thêm nhân viên đầu tiên ở phía trên.</div></td></tr>{% endfor %}
+  </tbody></table></div>
+</section>
+{% endblock %}

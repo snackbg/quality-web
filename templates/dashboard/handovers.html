@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% block title %}Bàn giao{% endblock %}
+{% block breadcrumb %}BÀN GIAO{% endblock %}
+{% block content %}
+<section class="page-heading">
+  <div><span class="eyebrow">ACTION FOLLOWING</span><h1>Bàn giao công việc</h1><p class="muted">Theo dõi đầu việc, người phụ trách và hạn hoàn thành.</p></div>
+  <span class="record-count"><strong>{{ handovers|length }}</strong> mục</span>
+</section>
+{% if access.can_manage_handovers %}<section class="panel form-panel">
+  <div class="section-heading"><div><span class="eyebrow">CREATE HANDOVER</span><h2>Tạo mục theo dõi</h2></div><span class="form-index">01 / NEW</span></div>
+  <form method="post" class="form-grid">
+    {% csrf_token %}
+    <label class="field-wide">Nội dung<input name="title" maxlength="160" required placeholder="VD: Kiểm tra nguyên nhân lỗi ngoại quan"></label>
+    <label>Line / khu vực<input name="line" maxlength="80" placeholder="Line 03"></label>
+    <label>Người phụ trách<input name="owner" maxlength="100" placeholder="Tên người nhận việc"></label>
+    <label>Hạn hoàn thành<input name="deadline" type="date"></label>
+    <label class="field-wide">Chi tiết<textarea name="details" maxlength="1000" rows="2" placeholder="Bối cảnh, yêu cầu hoặc bước tiếp theo"></textarea></label>
+    <div class="form-actions"><button class="button button-primary" type="submit">Tạo bàn giao <span>+</span></button></div>
+  </form>
+</section>
+{% endif %}
+<section class="panel table-panel">
+  <div class="section-heading"><div><span class="eyebrow">OPEN ITEMS FIRST</span><h2>Danh sách bàn giao</h2></div></div>
+  <div class="table-scroll"><table><thead><tr><th>Công việc</th><th>Line</th><th>Phụ trách</th><th>Hạn</th><th>Trạng thái</th><th></th></tr></thead><tbody>
+  {% for item in handovers %}<tr><td><strong>{{ item.title }}</strong>{% if item.details %}<small class="table-subtext">{{ item.details }}</small>{% endif %}</td><td>{{ item.line|default:'—' }}</td><td>{{ item.owner|default:'—' }}</td><td class="code-cell">{{ item.deadline|default:'—' }}</td><td><span class="status-pill {% if item.status == 'Done' %}pill-done{% else %}pill-open{% endif %}">{{ item.status }}</span></td><td>{% if access.can_manage_handovers and item.status == 'Open' %}<form method="post" action="{% url 'handover-status' item.id %}">{% csrf_token %}<input type="hidden" name="status" value="Done"><button class="button button-small" type="submit">Hoàn tất <span>✓</span></button></form>{% endif %}</td></tr>
+  {% empty %}<tr><td colspan="6"><div class="table-empty">Chưa có mục bàn giao. Tạo mục mới ở phía trên.</div></td></tr>{% endfor %}
+  </tbody></table></div>
+</section>
+{% endblock %}

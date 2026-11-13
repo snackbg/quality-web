@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% block title %}Báo cáo chấm công{% endblock %}
+{% block breadcrumb %}BÁO CÁO CHẤM CÔNG{% endblock %}
+{% block content %}
+<section class="page-heading">
+  <div><span class="eyebrow">HUMAN CAPITAL · REPORTS</span><h1>Báo cáo chấm công</h1><p class="muted">Lọc theo thời gian, mã nhân viên và tình trạng.</p></div>
+  <span class="record-count"><strong>{{ records|length }}</strong> bản ghi</span>
+</section>
+<section class="panel report-filter-panel">
+  <div class="section-heading"><div><span class="eyebrow">FILTERS</span><h2>Điều kiện báo cáo</h2></div></div>
+  <form method="get" class="report-form">
+    <label>Từ ngày<input type="date" name="start_date" value="{{ filters.start_date }}"></label>
+    <label>Đến ngày<input type="date" name="end_date" value="{{ filters.end_date }}"></label>
+    <label>Mã nhân viên<input type="search" name="employee_code" value="{{ filters.employee_code }}" placeholder="Nhập một phần hoặc toàn bộ ID"></label>
+    <label>Tình trạng<select name="status"><option value="">Tất cả</option>{% for code, label in status_labels.items %}<option value="{{ code }}" {% if filters.status == code %}selected{% endif %}>{{ label }}</option>{% endfor %}</select></label>
+    <div class="report-actions"><button class="button button-dark" type="submit">Lọc dữ liệu <span>⌕</span></button><span class="export-divider"></span><button class="button button-export" type="submit" name="export" value="xlsx" title="Tải Excel">XLSX <span>↓</span></button><button class="button button-export" type="submit" name="export" value="csv" title="Tải CSV">CSV <span>↓</span></button><button class="button button-export" type="submit" name="export" value="pdf" title="Tải PDF">PDF <span>↓</span></button></div>
+  </form>
+</section>
+<section class="panel table-panel report-table-panel">
+  <div class="section-heading"><div><span class="eyebrow">ATTENDANCE RECORDS</span><h2>Kết quả lọc</h2></div><span class="record-count">{{ filters.start_date }} — {{ filters.end_date }}</span></div>
+  <div class="table-scroll"><table><thead><tr><th>No</th><th>Mã nhân viên</th><th>Họ và tên</th><th>Phòng ban</th><th>Ngày</th><th>Status</th><th>Clock In</th><th>Clock Out</th><th>Ghi chú</th></tr></thead><tbody>
+  {% for row in records %}<tr><td class="row-number">{{ forloop.counter|stringformat:"02d" }}</td><td class="code-cell">{{ row.employee_code }}</td><td><strong>{{ row.name }}</strong></td><td>{{ row.department|default:'—' }}</td><td class="code-cell">{{ row.work_date }}</td><td><span class="status-pill {% if row.status == 'Online' %}pill-active{% elif row.status == 'AL' or row.status == 'SL' %}pill-leave{% else %}pill-open{% endif %}">{{ row.status }}</span></td><td class="code-cell">{{ row.clock_in|default:'—' }}</td><td class="code-cell">{{ row.clock_out|default:'—' }}</td><td>{{ row.note|default:'—' }}</td></tr>
+  {% empty %}<tr><td colspan="9"><div class="table-empty">Không có dữ liệu phù hợp với điều kiện lọc.</div></td></tr>{% endfor %}
+  </tbody></table></div>
+</section>
+{% endblock %}

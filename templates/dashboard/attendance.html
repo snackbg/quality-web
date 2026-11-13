@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% block title %}Chấm công{% endblock %}
+{% block breadcrumb %}CHẤM CÔNG{% endblock %}
+{% block content %}
+<section class="page-heading">
+  <div><span class="eyebrow">HUMAN CAPITAL · CHECK-IN</span><h1>Điểm danh đầu ca</h1><p class="muted">Ghi nhận lượt vào ca theo ID nhân viên.</p></div>
+</section>
+{% if scan_result %}
+<section class="scan-result" aria-live="polite">
+  <span class="scan-confirm-icon" aria-hidden="true">✓</span>
+  <div class="scan-confirm-copy"><span class="eyebrow">CHECK-IN ĐÃ GHI NHẬN</span><h2>{{ scan_result.name }}</h2><p>{{ scan_result.employee_code }}{% if scan_result.department %} · {{ scan_result.department }}{% endif %}</p></div>
+  <div class="scan-clock"><strong>{{ scan_result.clock_in }}</strong><span>GIỜ CHECK-IN</span></div>
+</section>
+{% endif %}
+{% if access.can_scan_attendance %}
+<section class="scan-station">
+  <div class="scan-station-copy"><span class="scan-station-mark" aria-hidden="true">▥</span><div><span class="eyebrow">KIOSK · ĐẦU GIỜ</span><h2>Sẵn sàng quét thẻ</h2><p>Đưa ID nhân viên vào vùng đọc.</p></div></div>
+  <form method="post" class="scan-form" id="attendance-scan-form">
+    {% csrf_token %}
+    <label for="scan-id">SCAN ID</label>
+    <div class="scan-input-row"><div class="scan-input-wrap"><span aria-hidden="true">⌕</span><input id="scan-id" name="employee_code" type="text" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="Quét ID nhân viên" required autofocus></div><button class="button button-primary scan-submit" type="submit">Ghi nhận <span>↵</span></button></div>
+  </form>
+</section>
+{% endif %}
+<section class="panel table-panel">
+  <div class="section-heading"><div><span class="eyebrow">SHIFT LOG</span><h2>Lượt check-in gần đây</h2></div><span class="record-count"><strong>{{ attendance_rows|length }}</strong> lượt · {{ selected_date }}</span></div>
+  <div class="table-scroll"><table><thead><tr><th>No</th><th>ID</th><th>Họ và tên</th><th>Ngày</th><th>Clock In</th><th>Clock Out</th><th>Trạng thái</th></tr></thead><tbody>
+  {% for row in attendance_rows %}<tr><td class="row-number">{{ forloop.counter|stringformat:"02d" }}</td><td class="code-cell">{{ row.employee_code }}</td><td><span class="person-cell"><span class="person-avatar">{{ row.name|slice:":1"|upper }}</span><strong>{{ row.name }}</strong></span></td><td class="code-cell">{{ row.work_date }}</td><td class="clock-cell">{{ row.clock_in|default:'—' }}</td><td class="code-cell">{{ row.clock_out|default:'—' }}</td><td><span class="status-pill pill-active">{% if row.status == 'Present' %}Online{% else %}{{ row.status }}{% endif %}</span></td></tr>
+  {% empty %}<tr><td colspan="7"><div class="table-empty">Chưa có lượt check-in trong ngày {{ selected_date }}.</div></td></tr>{% endfor %}
+  </tbody></table></div>
+</section>
+<script>
+  const scanInput = document.getElementById("scan-id");
+  if (scanInput) {
+    scanInput.focus();
+    scanInput.select();
+  }
+</script>
+{% endblock %}

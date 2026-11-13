@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+{% block title %}Tổng quan{% endblock %}
+{% block breadcrumb %}TỔNG QUAN{% endblock %}
+{% block content %}
+<section class="page-heading">
+  <div><span class="eyebrow">OPERATIONS OVERVIEW · {{ today }}</span><h1>Chào {{ request.user.get_short_name|default:request.user.username }}.</h1><p class="muted">Tổng quan nhân sự và hoạt động trong ngày.</p></div>
+  <span class="dashboard-date-chip"><i></i> Đang xem hôm nay</span>
+</section>
+<section class="dashboard-balance">
+  <div class="balance-copy"><span class="balance-kicker">NHÂN SỰ ĐANG HOẠT ĐỘNG</span><strong>{{ active_employees }}</strong><span class="balance-caption">nhân viên trong danh bạ</span></div>
+  <div class="balance-divider"></div>
+  <div class="balance-stat"><span>Đã có mặt</span><strong>{{ present_today }} <small>/ {{ active_employees }}</small></strong><div class="balance-progress"><i style="width:{{ attendance_rate }}%"></i></div></div>
+  <div class="balance-stat"><span>Chưa ghi nhận</span><strong>{{ unrecorded_today }}</strong><span class="balance-caption">trong ngày hôm nay</span></div>
+  <div class="balance-actions">
+    {% if access.can_scan_attendance %}<a class="balance-action" href="{% url 'attendance' %}"><span>＋</span>Check In</a>{% endif %}
+    {% if access.can_scan_checkout %}<a class="balance-action" href="{% url 'checkout' %}"><span>↗</span>Check Out</a>{% endif %}
+    <a class="balance-action balance-action-light" href="{% url 'attendance-reports' %}"><span>▤</span>Báo cáo</a>
+  </div>
+</section>
+<section class="dashboard-analytics">
+  <article class="panel flow-panel">
+    <div class="section-heading flow-heading"><div><span class="eyebrow">HUMAN CAPITAL</span><h2>Nhịp độ chấm công</h2><p class="muted">7 ngày gần nhất</p></div><a class="inline-link" href="{% url 'attendance-reports' %}">Báo cáo chi tiết <span>→</span></a></div>
+    <div class="flow-legend"><span><i class="legend-present"></i>Có mặt <strong>{{ weekly_present }}</strong></span><span><i class="legend-leave"></i>Nghỉ <strong>{{ weekly_leave }}</strong></span></div>
+    <div class="flow-chart">
+      <div class="flow-axis"><span>{{ chart_scale }}</span><span>{{ chart_midpoint }}</span><span>0</span></div>
+      <div class="flow-plot"><div class="flow-grid-lines"><i></i><i></i><i></i></div><div class="flow-bars">
+        {% for day in chart_days %}<div class="flow-day"><div class="flow-columns"><div class="flow-bar bar-present" style="height:{{ day.present_height }}%" title="{{ day.present }} lượt có mặt"></div><div class="flow-bar bar-leave" style="height:{{ day.leave_height }}%" title="{{ day.leave }} lượt nghỉ"></div></div><span>{{ day.weekday }}</span><small>{{ day.label }}</small></div>{% endfor %}
+      </div></div>
+    </div>
+  </article>
+  <article class="panel today-panel">
+    <div class="section-heading"><div><span class="eyebrow">TODAY · {{ today }}</span><h2>Phân bổ hôm nay</h2></div><a class="inline-link" href="{% url 'attendance' %}">Mở chấm công <span>→</span></a></div>
+    <div class="today-total"><strong>{{ attendance_total }}</strong><span>lượt ghi nhận</span></div>
+    <div class="today-status-list">
+      {% for status, count in attendance.items %}<div class="today-status-row"><span><i class="status-dot status-dot-{{ forloop.counter }}"></i>{{ status }}</span><strong>{{ count }}</strong></div>{% empty %}<div class="empty-state compact-empty"><strong>Chưa có dữ liệu hôm nay</strong><p>Các lượt chấm công sẽ xuất hiện tại đây.</p></div>{% endfor %}
+    </div>
+    <div class="today-footer"><span>Đang nghỉ</span><strong>{{ leave_today }}</strong><span class="footer-divider"></span><span>Việc đang mở</span><strong>{{ open_handovers }}</strong></div>
+  </article>
+</section>
+<section class="dashboard-lower">
+  <article class="panel activity-panel">
+    <div class="section-heading"><div><span class="eyebrow">RECENT ACTIVITY</span><h2>Check-in gần đây</h2></div><a class="inline-link" href="{% url 'attendance' %}">Tất cả <span>↗</span></a></div>
+    <div class="table-scroll"><table class="dashboard-table"><thead><tr><th>NHÂN VIÊN</th><th>GIỜ VÀO</th><th>GIỜ RA</th><th>STATUS</th></tr></thead><tbody>
+      {% for item in recent_attendance %}<tr><td><span class="person-cell"><span class="person-avatar">{{ item.name|slice:":1"|upper }}</span><span><strong>{{ item.name }}</strong><small class="table-subtext">{{ item.employee_code }}</small></span></span></td><td class="clock-cell">{{ item.clock_in|default:'—' }}</td><td class="code-cell">{{ item.clock_out|default:'—' }}</td><td><span class="status-pill {% if item.status == 'Online' %}pill-done{% else %}pill-leave{% endif %}">{{ item.status }}</span></td></tr>
+      {% empty %}<tr><td colspan="4"><div class="table-empty">Chưa có lượt check-in hôm nay.</div></td></tr>{% endfor %}
+    </tbody></table></div>
+  </article>
+  <article class="panel handover-panel">
+    <div class="section-heading"><div><span class="eyebrow">ACTION FOLLOWING</span><h2>Bàn giao gần đây</h2></div><a class="inline-link" href="{% url 'handovers' %}">Tất cả <span>↗</span></a></div>
+    {% if recent_handovers %}<div class="handover-list">{% for item in recent_handovers %}<div class="handover-item"><div class="handover-line-mark"></div><div class="handover-copy"><strong>{{ item.title }}</strong><span>{{ item.line|default:'Chưa phân line' }} · {{ item.owner|default:'Chưa giao phụ trách' }}</span></div><span class="status-pill {% if item.status == 'Done' %}pill-done{% else %}pill-open{% endif %}">{{ item.status }}</span></div>{% endfor %}</div>
+    {% else %}<div class="empty-state compact-empty"><strong>Chưa có bàn giao</strong><p>Các đầu việc mới sẽ hiển thị tại đây.</p><a class="inline-link" href="{% url 'handovers' %}">Tạo bàn giao <span>→</span></a></div>{% endif %}
+  </article>
+</section>
+{% endblock %}
